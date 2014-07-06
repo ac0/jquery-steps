@@ -805,6 +805,10 @@ function paginationClickHandler(event)
         state = getState(wizard),
         href = anchor.attr("href");
 
+    if (anchor.parent().hasClass("disabled")){
+        return false;
+    }
+
     switch (href.substring(href.lastIndexOf("#") + 1))
     {
         case "cancel":
