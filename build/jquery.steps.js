@@ -539,6 +539,10 @@ function goToStep(wizard, options, state, index)
     }
     else
     {
+        if (options.reloadContentOnStepChangeFailure) {
+            loadAsyncContent(wizard, options, state);
+        }
+
         wizard.find(".steps li").eq(oldIndex).addClass("error");
     }
 
@@ -1846,6 +1850,17 @@ var defaults = $.fn.steps.defaults = {
      * @for defaults
      **/
     showFinishButtonAlways: false,
+
+    /**
+     * If set, reloads the content of the pane if onStepChanging returned false
+     * Useful to reload the view with errors if a submit was attempted onStepChanging.
+     *
+     * @property reloadContentOnStepChangeFailure
+     * @type Boolean
+     * @default false
+     * @for defaults
+     **/
+    reloadContentOnStepChangeFailure: false,
 
     /**
      * Prevents jumping to a previous step.
