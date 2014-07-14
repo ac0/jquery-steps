@@ -1,6 +1,6 @@
 /*! 
  * jQuery Steps v1.0.7.f.1-SNAPSHOT - 6 July 2014
- * Copyright (c) 2014 AC
+ * Copyright (c) 2014 /kbafz2
  * Licensed under GPL
  *
  * jQuery Steps v1.0.7 - 05/07/2014
