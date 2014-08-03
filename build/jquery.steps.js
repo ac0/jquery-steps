@@ -510,7 +510,7 @@ function goToPreviousStep(wizard, options, state)
  * @param index {Integer} The position (zero-based) to route to
  * @return {Boolean} Indicates whether the action succeeded or failed
  **/
-function goToStep(wizard, options, state, index)
+function goToStep(wizard, options, state, index, stepChanging)
 {
     if (index < 0 || index >= state.stepCount)
     {
@@ -523,7 +523,7 @@ function goToStep(wizard, options, state, index)
     }
 
     var oldIndex = state.currentIndex;
-    if (wizard.triggerHandler("stepChanging", [state.currentIndex, index]))
+    if (wizard.triggerHandler(stepChanging, [state.currentIndex, index]))
     {
         // Save new state
         state.currentIndex = index;
@@ -775,7 +775,7 @@ function paginationClick(wizard, options, state, index)
 
         // Enable the step to make the anchor clickable!
         parent._enableAria();
-        anchor.click();
+        stepClickHandlerWrk(anchor, 'stepChangingByNext');
 
         // An error occured
         if (oldIndex === state.currentIndex && isDisabled)
@@ -938,6 +938,7 @@ function registerEvents(wizard, options)
     wizard.bind("finishing" + eventNamespace, options.onFinishing);
     wizard.bind("finished" + eventNamespace, options.onFinished);
     wizard.bind("stepChanging" + eventNamespace, options.onStepChanging);
+    wizard.bind("stepChangingByNext" + eventNamespace, options.onStepChangingByNext);
     wizard.bind("stepChanged" + eventNamespace, options.onStepChanged);
 
     if (options.enableKeyNavigation)
@@ -1277,8 +1278,12 @@ function stepClickHandler(event)
 {
     event.preventDefault();
 
-    var anchor = $(this),
-        wizard = anchor.parent().parent().parent().parent(),
+    return stepClickHandlerWrk($(this), 'stepChanging');
+}
+
+function stepClickHandlerWrk(anchor, stepChanging)
+{
+    var wizard = anchor.parent().parent().parent().parent(),
         options = getOptions(wizard),
         state = getState(wizard),
         oldIndex = state.currentIndex;
@@ -1288,7 +1293,7 @@ function stepClickHandler(event)
         var href = anchor.attr("href"),
             position = parseInt(href.substring(href.lastIndexOf("-") + 1), 0);
 
-        goToStep(wizard, options, state, position);
+        goToStep(wizard, options, state, position, stepChanging);
     }
 
     // If nothing has changed
@@ -1932,6 +1937,8 @@ var defaults = $.fn.steps.defaults = {
      **/
     onStepChanging: function (event, currentIndex, newIndex) { return true; },
 
+	onStepChangingByNext: function (event, currentIndex, newIndex) { return true;/*this.onStepChanging(event, currentIndex, newIndex);*/ },
+	
     /**
      * Fires after the step has change. 
      *
